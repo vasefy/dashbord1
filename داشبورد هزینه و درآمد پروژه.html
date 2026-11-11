@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>داشبورد هزینه و درآمد پروژه پتروشیمی دماوند</title>
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);--bg:#f6f7f9;--card:#fff;--tx:#1b2430;--mut:#667085;--bd:#e3e7ee;--pri:#1d5fd1;--ok:#13875a;--bad:#c93030;--c1:#1d5fd1;--c2:#e08a00;--c3:#13875a;--c4:#7a4fd1;--c5:#c93030}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:#12161c;--card:#1b212b;--tx:#e8ecf2;--mut:#9aa5b6;--bd:#2c3542;--pri:#6ea0ff;--ok:#43c795;--bad:#ff7b7b}}
+:root[data-theme="dark"]{color-scheme:dark;--bg:#12161c;--card:#1b212b;--tx:#e8ecf2;--mut:#9aa5b6;--bd:#2c3542;--pri:#6ea0ff;--ok:#43c795;--bad:#ff7b7b}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font-family:Vazirmatn,Tahoma,"Segoe UI",sans-serif;font-size:14px;line-height:1.7;padding:14px}
+h1{font-size:18px;margin:0 0 2px}.sub{color:var(--mut);font-size:12px;margin-bottom:12px}
+.tabs{display:flex;gap:6px;overflow-x:auto;padding-bottom:6px;margin-bottom:10px}
+.tabs button{flex:none;border:1px solid var(--bd);background:var(--card);color:var(--tx);border-radius:18px;padding:5px 14px;font:inherit;cursor:pointer}
+.tabs button.on{background:var(--pri);color:#fff;border-color:var(--pri)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:12px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:12px;margin-bottom:12px}
+.grid .card{margin:0}
+.k{color:var(--mut);font-size:12px}.v{font-size:19px;font-weight:700}
+.pos{color:var(--ok)}.neg{color:var(--bad)}
+h2{font-size:15px;margin:0 0 8px}
+.row{display:grid;grid-template-columns:110px 1fr 90px;gap:8px;align-items:center;margin:5px 0;font-size:13px}
+.bar{height:10px;background:var(--bd);border-radius:5px;overflow:hidden}.bar i{display:block;height:100%;border-radius:5px}
+.num{text-align:left;direction:ltr;font-variant-numeric:tabular-nums}
+.sc{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:12.5px;min-width:560px}
+th,td{padding:6px 8px;border-bottom:1px solid var(--bd);text-align:right;white-space:nowrap}
+td.num{text-align:left}th{color:var(--mut);font-weight:600}tr.t td{font-weight:700}
+select{font:inherit;padding:4px 8px;border:1px solid var(--bd);border-radius:8px;background:var(--card);color:var(--tx)}
+input{width:96px;font:inherit;font-size:12px;padding:3px 5px;border:1px solid var(--bd);border-radius:6px;background:var(--bg);color:var(--tx);direction:ltr;text-align:left}
+.note{color:var(--mut);font-size:12px}
+</style>
+</head>
+<body>
+<h1>داشبورد هزینه و درآمد پروژه پتروشیمی دماوند</h1>
+<div class="sub">مبالغ به میلیون ریال · داده‌های نمونه، در تب «ورود اطلاعات» قابل ویرایش است</div>
+<div style="margin-bottom:8px"><label class="note">دوره: </label><select id="per"></select> <select id="mo"></select></div><div class="tabs" id="tabs"></div>
+<div id="app"></div>
+<script>
+const U=['واحد آب','واحد پساب','واحد برق و بخار','واحد هوا','واحد آفسایت'];
+const OV=[['sal','حقوق و بیمه پرسنل'],['rest','رستوران'],['trans','ایاب و ذهاب'],['acc','اسکان'],['quota','سهمیه ماهانه']];
+const MN=[['eng','مهندسی'],['proc','خرید'],['exe','اجرا']];
+const COL=['var(--c1)','var(--c2)','var(--c3)','var(--c4)','var(--c5)'];
+let D={
+ u:[
+ {rev:900000,eng:60000,proc:300000,exe:200000,sal:30000,rest:8000,trans:5000,acc:6000,quota:4000},
+ {rev:700000,eng:50000,proc:220000,exe:170000,sal:26000,rest:7000,trans:4500,acc:5500,quota:3500},
+ {rev:1500000,eng:110000,proc:520000,exe:340000,sal:42000,rest:11000,trans:7000,acc:8500,quota:6000},
+ {rev:600000,eng:40000,proc:190000,exe:140000,sal:22000,rest:6000,trans:4000,acc:4500,quota:3000},
+ {rev:800000,eng:55000,proc:250000,exe:210000,sal:28000,rest:7500,trans:4800,acc:5800,quota:3800}],
+ hq:{proj:{sal:60000,rest:12000,trans:8000,acc:9000,quota:6000},site:{sal:45000,rest:15000,trans:9000,acc:12000,quota:7000}}
+};
+const DP=[['civ','سیویل',.3],['mech','مکانیکال',.4],['ei','برق و ابزار دقیق',.3]];
+D.u.forEach(u=>MN.forEach(([k])=>{DP.forEach(([d,,w])=>{u[k+'_'+d]=Math.round(u[k]*w)});delete u[k]}));
+const RW={eng:.1,proc:.5,exe:.4},RK=MN.flatMap(([k])=>DP.map(([d])=>'r_'+k+'_'+d));
+D.u.forEach(u=>{MN.forEach(([k])=>DP.forEach(([d,,w])=>{u['r_'+k+'_'+d]=Math.round(u.rev*RW[k]*w)}));delete u.rev});
+const rtab=a=>`<div class="sc"><table style="min-width:420px"><tr><th>بخش</th>${DP.map(x=>`<th>${x[1]}</th>`).join('')}<th>جمع</th></tr>${MN.map(([k,l])=>`<tr><td>${l}</td>${DP.map(([d])=>`<td class="num">${f(a.reduce((s,u)=>s+(+u['r_'+k+'_'+d]||0),0))}</td>`).join('')}<td class="num">${f(a.reduce((s,u)=>s+DP.reduce((x,[d])=>x+(+u['r_'+k+'_'+d]||0),0),0))}</td></tr>`).join('')}<tr class="t"><td>جمع</td>${DP.map(([d])=>`<td class="num">${f(a.reduce((s,u)=>s+MN.reduce((x,[k])=>x+(+u['r_'+k+'_'+d]||0),0),0))}</td>`).join('')}<td class="num">${f(a.reduce((s,u)=>s+sum(u,RK),0))}</td></tr></table></div>`;
+const FM=['فروردین','اردیبهشت','خرداد','تیر','مرداد','شهریور','مهر','آبان','آذر','دی','بهمن','اسفند'],fy=y=>(+y).toLocaleString('fa-IR',{useGrouping:false}),MNAMES=Array.from({length:240},(_,i)=>FM[i%12]+' '+fy(1391+Math.floor(i/12))),NOW=174,W2=(()=>{const r=MNAMES.map((_,i)=>Math.exp(-(((i-110)/80)**2))),t=r.reduce((a,b)=>a+b,0);return r.map(x=>x/t)})();
+const MNAMES_OLD=['آبان ۱۴۰۴','آذر ۱۴۰۴','دی ۱۴۰۴','بهمن ۱۴۰۴','اسفند ۱۴۰۴','فروردین ۱۴۰۵','اردیبهشت ۱۴۰۵','خرداد ۱۴۰۵','تیر ۱۴۰۵','مرداد ۱۴۰۵','شهریور ۱۴۰۵','مهر ۱۴۰۵'],W=[.04,.06,.08,.09,.10,.11,.11,.11,.10,.09,.06,.05];
+const sc=(o,w)=>{const r={};for(const k in o)r[k]=Math.round(o[k]*w);return r};
+const M=W2.map(w=>({u:D.u.map(u=>sc(u,w)),hq:{proj:sc(D.hq.proj,w),site:sc(D.hq.site,w)}}));
+const addo=(a,b)=>{for(const k in b)a[k]=(a[k]||0)+b[k];return a};
+function agg(s){if(s!=='all')return M[+s];const r={u:U.map(()=>({})),hq:{proj:{},site:{}}};M.forEach(m=>{m.u.forEach((u,i)=>addo(r.u[i],u));addo(r.hq.proj,m.hq.proj);addo(r.hq.site,m.hq.site)});return r}
+let per='all';
+const ML=i=>MNAMES[i]+(i>NOW?' (برنامه)':'');
+function trend(){const sv=D;const o=M.map(m=>{D=m;return calc()});D=sv;return o}
+let Y='now',MO='all';
+const rng=()=>{if(Y==='now')return[0,NOW];if(Y==='full')return[0,239];const b=(+Y-1391)*12;return MO==='all'?[b,b+11]:[b+ +MO,b+ +MO]};
+function aggR(a,b){if(a===b)return M[a];const r={u:U.map(()=>({})),hq:{proj:{},site:{}}};for(let i=a;i<=b;i++){const m=M[i];m.u.forEach((u,j)=>addo(r.u[j],u));addo(r.hq.proj,m.hq.proj);addo(r.hq.site,m.hq.site)}return r}
+function fixData(t){if(t==='data'){if(isNaN(+Y)){Y='1405';MO='6'}else if(MO==='all')MO='0'}}
+function sel(){const s=document.getElementById('per'),m=document.getElementById('mo'),d=tab==='data';let h=d?'':'<option value="now">از ابتدا تا الان (تجمعی)</option><option value="full">کل دوره پروژه (۱۳۹۱ تا ۱۴۱۰)</option>';for(let y=1391;y<=1410;y++)h+=`<option value="${y}">سال ${fy(y)}</option>`;s.innerHTML=h;s.value=Y;m.style.display=isNaN(+Y)?'none':'';m.innerHTML=(d?'':'<option value="all">کل سال</option>')+FM.map((n,i)=>`<option value="${i}">${n}</option>`).join('');m.value=MO}
+function view(){const[a,b]=rng();D=aggR(a,b);render();const A=document.getElementById('app');const t=tab==='data'?'ویرایش داده‌های ماه '+ML(a):Y==='now'?'نمایش: از ابتدای پروژه تا '+ML(NOW)+' (تجمعی)':Y==='full'?'نمایش: کل دوره پروژه (شامل برنامه ماه‌های آینده)':a===b?'نمایش: وضعیت ماه '+ML(a):'نمایش: مجموع سال '+fy(Y)+(a>NOW?' (برنامه)':'');A.insertAdjacentHTML('afterbegin',`<div class="note" style="margin-bottom:8px">${t}</div>`);if(tab!=='data')A.insertAdjacentHTML('beforeend',trendCard()+overview(calc()))}
+function trendCard(){const yr=!isNaN(+Y),hi=Y==='now'?NOW:239,it=[];if(yr){const b=(+Y-1391)*12;FM.forEach((n,m)=>it.push({l:n,a:b+m,b:b+m,s:String(m)===String(MO)}))}else for(let y=0;y*12<=hi;y++)it.push({l:fy(1391+y),a:y*12,b:Math.min(y*12+11,hi)});
+const sv=D,R=it.map(x=>{D=aggR(x.a,x.b);const c=calc();return tab==='all'?c.T:c.rows[+tab]});D=sv;const mx=Math.max(...R.map(r=>Math.max(r.rev,r.cost)),1),S=R.reduce((a,r)=>({rev:a.rev+r.rev,cost:a.cost+r.cost,pr:a.pr+r.pr}),{rev:0,cost:0,pr:0});
+return `<div class="card"><h2>${yr?'روند ماهانه سال '+fy(Y):'روند سالانه'}: درآمد و هزینه</h2><div class="note" style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:6px"><span><b style="color:var(--ok)">■</b> درآمد</span><span><b style="color:var(--bad)">■</b> هزینه کل (با سهم ستاد)</span><span>ستون کم‌رنگ = برنامه</span></div><div class="sc"><div style="display:flex;gap:4px;align-items:flex-end;height:120px;min-width:480px">${R.map((r,i)=>`<div style="flex:1;display:flex;gap:1px;align-items:flex-end;height:100%;opacity:${it[i].a>NOW?.5:1};${it[i].s?'background:var(--bd);border-radius:4px':''}" title="${yr?ML(it[i].a):it[i].l}"><i style="flex:1;height:${r.rev/mx*100}%;background:var(--ok);border-radius:3px 3px 0 0"></i><i style="flex:1;height:${r.cost/mx*100}%;background:var(--bad);border-radius:3px 3px 0 0"></i></div>`).join('')}</div><div style="display:flex;gap:4px;min-width:480px;font-size:10px;color:var(--mut)">${it.map(x=>`<span style="flex:1;text-align:center">${x.l}</span>`).join('')}</div></div><div class="sc" style="margin-top:8px;max-height:220px;overflow-y:auto"><table><tr><th>${yr?'ماه':'سال'}</th><th>درآمد</th><th>هزینه کل</th><th>سود / زیان</th><th>حاشیه</th></tr>${R.map((r,i)=>`<tr><td>${yr?ML(it[i].a):it[i].l}</td><td class="num">${f(r.rev)}</td><td class="num">${f(r.cost)}</td><td class="num ${r.pr>=0?'pos':'neg'}">${f(r.pr)}</td><td class="num">${p(r.mg)}</td></tr>`).join('')}<tr class="t"><td>مجموع</td><td class="num">${f(S.rev)}</td><td class="num">${f(S.cost)}</td><td class="num ${S.pr>=0?'pos':'neg'}">${f(S.pr)}</td><td class="num">${p(S.rev?S.pr/S.rev:0)}</td></tr></table></div></div>`}
+function trendCard_old(){const o=trend(),R=o.map(c=>tab==='all'?c.T:c.rows[+tab]);const mx=Math.max(...R.map(r=>Math.max(r.rev,r.cost)),1);const S=R.reduce((a,r)=>({rev:a.rev+r.rev,cost:a.cost+r.cost,pr:a.pr+r.pr}),{rev:0,cost:0,pr:0});
+return `<div class="card"><h2>روند ماهانه: درآمد و هزینه</h2><div class="note" style="display:flex;gap:12px;margin-bottom:6px"><span><b style="color:var(--ok)">■</b> درآمد</span><span><b style="color:var(--bad)">■</b> هزینه کل (با سهم ستاد)</span></div><div class="sc"><div style="display:flex;gap:6px;align-items:flex-end;height:130px;min-width:520px">${R.map((r,i)=>`<div style="flex:1;display:flex;gap:2px;align-items:flex-end;height:100%;${String(per)===String(i)?'background:var(--bd);border-radius:4px':''}" title="${ML(i)}"><i style="flex:1;height:${r.rev/mx*100}%;background:var(--ok);border-radius:3px 3px 0 0"></i><i style="flex:1;height:${r.cost/mx*100}%;background:var(--bad);border-radius:3px 3px 0 0"></i></div>`).join('')}</div><div style="display:flex;gap:6px;min-width:520px;font-size:11px;color:var(--mut)">${R.map((r,i)=>`<span style="flex:1;text-align:center">${ML(i).split(' ')[0]}</span>`).join('')}</div></div><div class="sc" style="margin-top:8px"><table><tr><th>ماه</th><th>درآمد</th><th>هزینه کل</th><th>سود / زیان</th><th>حاشیه</th></tr>${R.map((r,i)=>`<tr><td>${ML(i)}</td><td class="num">${f(r.rev)}</td><td class="num">${f(r.cost)}</td><td class="num ${r.pr>=0?'pos':'neg'}">${f(r.pr)}</td><td class="num">${p(r.mg)}</td></tr>`).join('')}<tr class="t"><td>مجموع</td><td class="num">${f(S.rev)}</td><td class="num">${f(S.cost)}</td><td class="num ${S.pr>=0?'pos':'neg'}">${f(S.pr)}</td><td class="num">${p(S.rev?S.pr/S.rev:0)}</td></tr></table></div></div>`}
+function sel_old(){const s=document.getElementById('per');s.innerHTML=(tab==='data'?'':'<option value="all">از ابتدا تا الان (تجمعی)</option>')+MNAMES.map((n,i)=>`<option value="${i}">${n}</option>`).join('');s.value=String(per)}
+const gc=(a,k)=>a.reduce((s,u)=>s+DP.reduce((x,[d])=>x+(+u[k+'_'+d]||0),0),0);
+const dtab=a=>`<div class="sc" style="margin-top:8px"><table style="min-width:420px"><tr><th>بخش</th>${DP.map(x=>`<th>${x[1]}</th>`).join('')}<th>جمع</th></tr>${MN.map(([k,l])=>`<tr><td>${l}</td>${DP.map(([d])=>`<td class="num">${f(a.reduce((s,u)=>s+(+u[k+'_'+d]||0),0))}</td>`).join('')}<td class="num">${f(gc(a,k))}</td></tr>`).join('')}<tr class="t"><td>جمع</td>${DP.map(([d])=>`<td class="num">${f(a.reduce((s,u)=>s+MN.reduce((x,[k])=>x+(+u[k+'_'+d]||0),0),0))}</td>`).join('')}<td class="num">${f(a.reduce((s,u)=>s+sum(u,MK),0))}</td></tr></table></div>`;
+const f=n=>Math.round(n).toLocaleString('fa-IR');
+const p=n=>(n*100).toLocaleString('fa-IR',{maximumFractionDigits:1})+'٪';
+const sum=(o,ks)=>ks.reduce((s,k)=>s+(+o[k]||0),0);
+const OK=OV.map(x=>x[0]),MK=MN.flatMap(([k])=>DP.map(([d])=>k+'_'+d));
+function calc(){
+ const hqP=sum(D.hq.proj,OK),hqS=sum(D.hq.site,OK),hq=hqP+hqS;
+ const tm=D.u.reduce((s,u)=>s+sum(u,MK),0);
+ const rows=D.u.map((u,i)=>{const main=sum(u,MK),ovh=sum(u,OK),sh=tm?main/tm:0;
+  const aP=hqP*sh,aS=hqS*sh,al=hq*sh,cost=main+ovh+al,rev=sum(u,RK);
+  return{i,name:U[i],rev,main,ovh,sh,aP,aS,al,cost,pr:rev-cost,mg:rev?(rev-cost)/rev:0}});
+ const T=rows.reduce((a,r)=>{for(const k of ['rev','main','ovh','al','cost','pr'])a[k]=(a[k]||0)+r[k];return a},{});
+ T.mg=T.rev?T.pr/T.rev:0;return{rows,T,hqP,hqS,hq,tm}}
+function bars(items,max){return items.map(([l,v,c])=>`<div class="row"><span>${l}</span><div class="bar"><i style="width:${max?Math.max(1,v/max*100):0}%;background:${c}"></i></div><span class="num">${f(v)}</span></div>`).join('')}
+function kpis(rev,cost,pr,mg,extra){return`<div class="grid"><div class="card"><div class="k">درآمد</div><div class="v">${f(rev)}</div></div><div class="card"><div class="k">هزینه کل (با سهم ستاد)</div><div class="v">${f(cost)}</div></div><div class="card"><div class="k">سود / زیان</div><div class="v ${pr>=0?'pos':'neg'}">${f(pr)}</div></div><div class="card"><div class="k">حاشیه سود</div><div class="v ${pr>=0?'pos':'neg'}">${p(mg)}</div></div>${extra||''}</div>`}
+let tab='all';
+function overview(c){const R=c.rows.concat([{name:'کل پروژه',rev:c.T.rev,main:c.tm,ovh:c.T.ovh,al:c.T.al,cost:c.T.cost,pr:c.T.pr}]);const mx=Math.max(...R.map(r=>Math.max(r.rev,r.cost)),1),w=v=>v/mx*100;
+return `<div class="card"><h2>نمای کلی پروژه: درآمد و ساختار هزینه</h2><div class="note" style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:8px"><span><b style="color:var(--c1)">■</b> هزینه اصلی</span><span><b style="color:var(--c2)">■</b> بالاسری واحد</span><span><b style="color:var(--c5)">■</b> سهم ستاد</span><span><b style="color:var(--ok)">|</b> درآمد</span></div>`+R.map(r=>`<div style="margin:10px 0"><div style="display:flex;justify-content:space-between;font-size:13px"><b>${r.name}</b><span class="${r.pr>=0?'pos':'neg'}">سود: ${f(r.pr)}</span></div><div style="position:relative;height:16px;background:var(--bd);border-radius:5px;overflow:hidden;display:flex"><i style="width:${w(r.main)}%;background:var(--c1)"></i><i style="width:${w(r.ovh)}%;background:var(--c2)"></i><i style="width:${w(r.al)}%;background:var(--c5)"></i><b style="position:absolute;top:0;bottom:0;right:${w(r.rev)}%;width:3px;background:var(--ok)"></b></div></div>`).join('')+`</div>`}
+function view_old(){const dm=per==='all'?M.length-1:per;D=agg(tab==='data'?dm:per);render();const A=document.getElementById('app');A.insertAdjacentHTML('afterbegin',`<div class="note" style="margin-bottom:8px">${tab==='data'?'ویرایش داده‌های ماه '+ML(+dm):per==='all'?'نمایش: از ابتدای پروژه تا '+ML(M.length-1)+' (تجمعی)':'نمایش: وضعیت ماه '+ML(+per)}</div>`);if(tab!=='data')A.insertAdjacentHTML('beforeend',trendCard()+overview(calc()))}
+function render(){
+ const c=calc(),A=document.getElementById('app');
+ if(tab==='data')return A.innerHTML=dataView();
+ if(tab==='all'){
+  const {T,rows}=c;
+  const comp=[...MN.map(([k,l],j)=>[l,gc(D.u,k),COL[j]]),['بالاسری واحدها',T.ovh,COL[3]],['ستاد پروژه',c.hqP,COL[4]],['ستاد کارگاه',c.hqS,'#5b6b82']];
+  const mx=Math.max(...comp.map(x=>x[1]),...rows.map(r=>Math.max(r.rev,r.cost)));
+  A.innerHTML=kpis(T.rev,T.cost,T.pr,T.mg)+
+  `<div class="card"><h2>ترکیب هزینه‌های کل پروژه</h2>${bars(comp,mx)}${dtab(D.u)}<div class="note">هزینه اصلی: ${f(c.tm)} · بالاسری واحدها: ${f(T.ovh)} · ستاد: ${f(c.hq)}</div></div>`+
+  `<div class="card"><h2>درآمد در برابر هزینه هر واحد</h2>${rows.map(r=>`<div style="margin:8px 0"><b>${r.name}</b>${bars([['درآمد',r.rev,'var(--ok)'],['هزینه کل',r.cost,'var(--bad)']],mx)}</div>`).join('')}</div>`+
+  `<div class="card"><h2>تفکیک درآمد</h2>${rtab(D.u)}</div><div class="card"><h2>تحلیل واحدها</h2><div class="sc"><table><tr><th>واحد</th><th>درآمد</th><th>هزینه اصلی</th><th>بالاسری</th><th>سهم ستاد</th><th>هزینه کل</th><th>سود</th><th>حاشیه</th></tr>${rows.map(r=>`<tr><td>${r.name}</td><td class="num">${f(r.rev)}</td><td class="num">${f(r.main)}</td><td class="num">${f(r.ovh)}</td><td class="num">${f(r.al)}</td><td class="num">${f(r.cost)}</td><td class="num ${r.pr>=0?'pos':'neg'}">${f(r.pr)}</td><td class="num">${p(r.mg)}</td></tr>`).join('')}<tr class="t"><td>کل پروژه</td><td class="num">${f(T.rev)}</td><td class="num">${f(c.tm)}</td><td class="num">${f(T.ovh)}</td><td class="num">${f(T.al)}</td><td class="num">${f(T.cost)}</td><td class="num ${T.pr>=0?'pos':'neg'}">${f(T.pr)}</td><td class="num">${p(T.mg)}</td></tr></table></div></div>`+
+  `<div class="card"><h2>هزینه‌های ستاد</h2><div class="sc"><table><tr><th></th>${OV.map(([k,l])=>`<th>${l}</th>`).join('')}<th>جمع</th><th>سهم</th></tr><tr><td>ستاد پروژه</td>${OV.map(([k])=>`<td class="num">${f(D.hq.proj[k])}</td>`).join('')}<td class="num">${f(c.hqP)}</td><td class="num">${p(c.hq?c.hqP/c.hq:0)}</td></tr><tr><td>ستاد کارگاه</td>${OV.map(([k])=>`<td class="num">${f(D.hq.site[k])}</td>`).join('')}<td class="num">${f(c.hqS)}</td><td class="num">${p(c.hq?c.hqS/c.hq:0)}</td></tr><tr class="t"><td>جمع کل</td>${OV.map(([k])=>`<td class="num">${f((+D.hq.proj[k]||0)+(+D.hq.site[k]||0))}</td>`).join('')}<td class="num">${f(c.hq)}</td><td class="num">${p(c.hq?1:0)}</td></tr></table></div></div>`;
+ }else{
+  const r=c.rows[+tab],u=D.u[+tab];
+  const mx=Math.max(...MN.map(([k])=>gc([u],k)),...OV.map(([k])=>+u[k]||0),r.aP,r.aS,1);
+  A.innerHTML=kpis(r.rev,r.cost,r.pr,r.mg,`<div class="card"><div class="k">سهم از هزینه‌های اصلی</div><div class="v">${p(r.sh)}</div></div>`)+
+  `<div class="card"><h2>هزینه‌های اصلی — ${f(r.main)}</h2>${bars(MN.map(([k,l],j)=>[l,gc([u],k),COL[j]]),mx)}${dtab([u])}</div><div class="card"><h2>تفکیک درآمد</h2>${rtab([u])}</div>`+
+  `<div class="card"><h2>هزینه‌های بالاسری — ${f(r.ovh)}</h2>${bars(OV.map(([k,l])=>[l,+u[k]||0,COL[3]]),mx)}</div>`+
+  `<div class="card"><h2>سهم تخصیصی ستاد — ${f(r.al)}</h2>${bars([['ستاد پروژه',r.aP,COL[4]],['ستاد کارگاه',r.aS,'#5b6b82']],mx)}<div class="note">ستاد به نسبت سهم این واحد از هزینه‌های اصلی کل پروژه (${p(r.sh)}) تقسیم شده است.</div></div>`+
+  `<div class="card"><h2>جمع‌بندی</h2><div class="sc"><table><tr><td>درآمد</td><td class="num">${f(r.rev)}</td></tr><tr><td>هزینه اصلی</td><td class="num">${f(r.main)}</td></tr><tr><td>بالاسری واحد</td><td class="num">${f(r.ovh)}</td></tr><tr><td>سهم ستاد</td><td class="num">${f(r.al)}</td></tr><tr class="t"><td>سود / زیان</td><td class="num ${r.pr>=0?'pos':'neg'}">${f(r.pr)}</td></tr></table></div></div>`;
+ }}
+function dataView(){
+ const inp=(path,v)=>`<input type="number" value="${v}" data-p="${path}">`;
+ const head='<tr><th>واحد</th>'+MN.flatMap(([k,l])=>DP.map(([d,dl])=>l+' '+dl)).concat(OV.map(x=>x[1])).map(t=>`<th>${t}</th>`).join('')+'<th>جمع کل</th></tr>';
+ const body=D.u.map((u,i)=>`<tr><td>${U[i]}</td>${MK.concat(OK).map(k=>`<td>${inp(i+'.'+k,u[k])}</td>`).join('')}<td class="num"><b>${f(sum(u,MK)+sum(u,OK))}</b></td></tr>`).join('');
+ const hq=OV.map(([k,l])=>`<tr><td>${l}</td><td>${inp('p.'+k,D.hq.proj[k])}</td><td>${inp('s.'+k,D.hq.site[k])}</td></tr>`).join('');
+ return`<h2 style="color:var(--pri);margin:4px 0 8px">بخش اول: درآمد</h2><div class="card"><h2>درآمد واحدها</h2><div class="sc"><table><tr><th>واحد</th>${MN.flatMap(([k,l])=>DP.map(([d,dl])=>`<th>${l} ${dl}</th>`)).join('')}<th>جمع کل</th></tr>${D.u.map((u,i)=>`<tr><td>${U[i]}</td>${RK.map(k=>`<td>${inp(i+'.'+k,u[k])}</td>`).join('')}<td class="num"><b>${f(sum(u,RK))}</b></td></tr>`).join('')}<tr class="t"><td>جمع درآمد پروژه</td><td colspan="9"></td><td class="num">${f(D.u.reduce((s,u)=>s+sum(u,RK),0))}</td></tr></table></div></div><h2 style="color:var(--pri);margin:16px 0 8px">بخش دوم: هزینه</h2><div class="card"><h2>هزینه‌های واحدهای تخصصی (اصلی و بالاسری)</h2><div class="sc"><table>${head}${body}<tr class="t"><td>جمع کل هزینه</td><td colspan="14"></td><td class="num">${f(D.u.reduce((s,u)=>s+sum(u,MK)+sum(u,OK),0))}</td></tr></table></div></div><div class="card"><h2>هزینه‌های ستاد</h2><div class="sc"><table><tr><th>ردیف</th><th>ستاد پروژه</th><th>ستاد کارگاه</th></tr>${hq}</table></div></div><div class="note">با تغییر هر عدد، همه تحلیل‌ها به‌روز می‌شوند.</div>`}
+document.getElementById('app').addEventListener('change',e=>{const a=e.target.dataset.p;if(!a)return;const [x,k]=a.split('.'),v=+e.target.value||0;
+ if(x==='p')D.hq.proj[k]=v;else if(x==='s')D.hq.site[k]=v;else D.u[+x][k]=v;view()});
+function tabs(){document.getElementById('tabs').innerHTML=[['all','کل پروژه'],...U.map((n,i)=>[String(i),n]),['data','ورود اطلاعات']].map(([k,l])=>`<button class="${k===tab?'on':''}" data-t="${k}">${l}</button>`).join('')}
+document.getElementById('tabs').addEventListener('click',e=>{const t=e.target.dataset.t;if(t==null)return;tab=t;fixData(t);sel();tabs();view()});
+document.getElementById('per').onchange=e=>{Y=e.target.value;MO=tab==='data'?'0':'all';sel();view()};document.getElementById('mo').onchange=e=>{MO=e.target.value;view()};sel();tabs();view();
+</script>
+</body>
+</html>
